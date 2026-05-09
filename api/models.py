@@ -36,7 +36,15 @@ class MaintenanceRequest(models.Model):
         ('completed', 'Completed'),
     )
 
-    title = models.CharField(max_length=255)
+    PRIORITY_CHOICES = (
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+    )
+
+    title = models.CharField(
+        max_length=255
+    )
 
     description = models.TextField()
 
@@ -44,6 +52,12 @@ class MaintenanceRequest(models.Model):
         max_length=20,
         choices=STATUS_CHOICES,
         default='pending'
+    )
+
+    priority = models.CharField(
+        max_length=10,
+        choices=PRIORITY_CHOICES,
+        default='medium'
     )
 
     created_by = models.ForeignKey(
@@ -60,12 +74,19 @@ class MaintenanceRequest(models.Model):
         related_name='assigned_requests'
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        ordering = ['-created_at']
 
     def __str__(self):
-        return self.title
+        return f"{self.title} ({self.status})"
 
 
 @receiver(post_save, sender=User)
