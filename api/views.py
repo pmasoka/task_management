@@ -34,6 +34,12 @@ def session_view(request):
     return JsonResponse({"isAuthenticated": True})
 
 def isauth_view(request):
+
     if not request.user.is_authenticated:
         return JsonResponse({"isAuthenticated": False})
-    return JsonResponse({"username":request.user.username})
+
+    return JsonResponse({
+        "isAuthenticated": True,
+        "username": request.user.username,
+        "role": request.user.profile.role
+    })
