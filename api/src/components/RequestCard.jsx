@@ -1,41 +1,93 @@
-const RequestCard = ({ request, children }) => {
+
+import StatusBadge from "./StatusBadge";
+
+const RequestCard = ({
+  request,
+  children,
+}) => {
 
   return (
-    <div className="card mb-3 shadow-sm">
+    <div className="card shadow-sm mb-4 border-0">
 
       <div className="card-body">
 
-        <div className="d-flex justify-content-between">
+        {/* HEADER */}
 
-          <h5>{request.title}</h5>
+        <div className="d-flex justify-content-between align-items-center mb-3">
 
-          <span className="badge bg-primary">
-            {request.status}
-          </span>
+          <h5 className="card-title mb-0">
+            {request.title}
+          </h5>
+
+          <StatusBadge
+            status={request.status}
+          />
 
         </div>
 
-        <p>{request.description}</p>
+        {/* DESCRIPTION */}
 
-        <p>
-          <strong>Priority:</strong> {request.priority}
+        <p className="card-text">
+          {request.description}
         </p>
 
-        <p>
-          <strong>Created By:</strong> {request.created_by_username}
-        </p>
+        {/* DETAILS */}
 
-        <p>
-          <strong>Assigned To:</strong>
+        <div className="row mt-3">
 
-          {
-            request.assigned_to_username
-              ? request.assigned_to_username
-              : " Unassigned"
-          }
-        </p>
+          <div className="col-md-6 mb-2">
 
-        {children}
+            <strong>Priority:</strong>{" "}
+
+            <span className="text-capitalize">
+              {request.priority}
+            </span>
+
+          </div>
+
+          <div className="col-md-6 mb-2">
+
+            <strong>Created By:</strong>{" "}
+
+            {request.created_by}
+
+          </div>
+
+          <div className="col-md-6 mb-2">
+
+            <strong>Assigned To:</strong>{" "}
+
+            {
+              request.assigned_to
+                ? request.assigned_to
+                : "Unassigned"
+            }
+
+          </div>
+
+          <div className="col-md-6 mb-2">
+
+            <strong>Created:</strong>{" "}
+
+            {
+              new Date(
+                request.created_at
+              ).toLocaleString()
+            }
+
+          </div>
+
+        </div>
+
+        {/* EXTRA ACTIONS */}
+
+        {
+          children && (
+            <div className="mt-4">
+              {children}
+            </div>
+          )
+        }
 
       </div>
 

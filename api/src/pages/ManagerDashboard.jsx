@@ -4,16 +4,29 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 import RequestCard from "../components/RequestCard";
-import StaffAssignment from "../components/StaffAssignment";
+import LoadingSpinner from "../components/LoadingSpinner";
+import EmptyState from "../components/EmptyState";
+import AssignmentUI from "../components/AssignmentUI";
 
 const ManagerDashboard = () => {
 
   const [requests, setRequests] = useState([]);
-  const [staffUsers, setStaffUsers] = useState([]);
+
+  const [staffUsers, setStaffUsers] =
+    useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  // =========================
+  // FETCH REQUESTS
+  // =========================
 
   const fetchRequests = async () => {
 
     try {
+
+      setLoading(true);
 
       const response = await axios.get(
         "http://127.0.0.1:8000/api/requests/",
@@ -27,8 +40,16 @@ const ManagerDashboard = () => {
     } catch (error) {
 
       console.log(error);
+
+    } finally {
+
+      setLoading(false);
     }
   };
+
+  // =========================
+  // FETCH STAFF USERS
+  // =========================
 
   const fetchStaffUsers = async () => {
 
@@ -63,7 +84,28 @@ const ManagerDashboard = () => {
         Manager Dashboard
       </h2>
 
+      {/* LOADING */}
+
       {
+        loading && <LoadingSpinner />
+      }
+
+      {/* EMPTY */}
+
+      {
+        !loading &&
+        requests.length === 0 && (
+
+          <EmptyState
+            message="No maintenance requests available."
+          />
+        )
+      }
+
+      {/* REQUESTS */}
+
+      {
+        !loading &&
         requests.map((request) => (
 
           <RequestCard
@@ -71,7 +113,7 @@ const ManagerDashboard = () => {
             request={request}
           >
 
-            <StaffAssignment
+            <AssignmentUI
               requestId={request.id}
               staffUsers={staffUsers}
               refreshRequests={fetchRequests}

@@ -1,17 +1,22 @@
-// src/pages/StaffDashboard.jsx
 
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 import RequestCard from "../components/RequestCard";
+import LoadingSpinner from "../components/LoadingSpinner";
+import EmptyState from "../components/EmptyState";
 
 const StaffDashboard = () => {
 
   const [tasks, setTasks] = useState([]);
 
+  const [loading, setLoading] = useState(true);
+
   const fetchTasks = async () => {
 
     try {
+
+      setLoading(true);
 
       const response = await axios.get(
         "http://127.0.0.1:8000/api/requests/",
@@ -25,31 +30,10 @@ const StaffDashboard = () => {
     } catch (error) {
 
       console.log(error);
-    }
-  };
 
-  const updateStatus = async (
-    requestId,
-    status
-  ) => {
+    } finally {
 
-    try {
-
-      await axios.patch(
-        `http://127.0.0.1:8000/api/requests/${requestId}/`,
-        {
-          status,
-        },
-        {
-          withCredentials: true,
-        }
-      );
-
-      fetchTasks();
-
-    } catch (error) {
-
-      console.log(error);
+      setLoading(false);
     }
   };
 
@@ -67,42 +51,27 @@ const StaffDashboard = () => {
       </h2>
 
       {
+        loading && <LoadingSpinner />
+      }
+
+      {
+        !loading &&
+        tasks.length === 0 && (
+
+          <EmptyState
+            message="No maintenance tasks assigned to you yet."
+          />
+        )
+      }
+
+      {
+        !loading &&
         tasks.map((task) => (
 
           <RequestCard
             key={task.id}
             request={task}
-          >
-
-            <div className="mt-3">
-
-              <button
-                className="btn btn-warning me-2"
-                onClick={() =>
-                  updateStatus(
-                    task.id,
-                    "in_progress"
-                  )
-                }
-              >
-                In Progress
-              </button>
-
-              <button
-                className="btn btn-success"
-                onClick={() =>
-                  updateStatus(
-                    task.id,
-                    "completed"
-                  )
-                }
-              >
-                Completed
-              </button>
-
-            </div>
-
-          </RequestCard>
+          />
         ))
       }
 

@@ -5,14 +5,20 @@ import axios from "axios";
 
 import CreateRequestForm from "../components/CreateRequestForm";
 import RequestCard from "../components/RequestCard";
+import LoadingSpinner from "../components/LoadingSpinner";
+import EmptyState from "../components/EmptyState";
 
 const ResidentDashboard = () => {
 
   const [requests, setRequests] = useState([]);
 
+  const [loading, setLoading] = useState(true);
+
   const fetchRequests = async () => {
 
     try {
+
+      setLoading(true);
 
       const response = await axios.get(
         "http://127.0.0.1:8000/api/requests/",
@@ -26,6 +32,10 @@ const ResidentDashboard = () => {
     } catch (error) {
 
       console.log(error);
+
+    } finally {
+
+      setLoading(false);
     }
   };
 
@@ -46,8 +56,30 @@ const ResidentDashboard = () => {
         refreshRequests={fetchRequests}
       />
 
+      {/* LOADING */}
+
       {
+        loading && <LoadingSpinner />
+      }
+
+      {/* EMPTY STATE */}
+
+      {
+        !loading &&
+        requests.length === 0 && (
+
+          <EmptyState
+            message="You have not created any maintenance requests yet."
+          />
+        )
+      }
+
+      {/* REQUEST LIST */}
+
+      {
+        !loading &&
         requests.map((request) => (
+
           <RequestCard
             key={request.id}
             request={request}
