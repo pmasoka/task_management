@@ -18,9 +18,7 @@ router.register(
 
 urlpatterns = [
 
-    # =========================
     # AUTH ENDPOINTS
-    # =========================
 
     path('csrf/', get_csrf_token, name='api-csrf'),
 
@@ -48,9 +46,7 @@ urlpatterns = [
         name='api-isauth'
     ),
 
-    # =========================
     # DRF ROUTES
-    # =========================
 
     path('', include(router.urls)),
 ]

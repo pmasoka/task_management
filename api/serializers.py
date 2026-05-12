@@ -3,13 +3,11 @@ from django.contrib.auth.models import User
 
 from .models import MaintenanceRequest
 
-
-# =========================
 # MAIN REQUEST SERIALIZER
-# =========================
 
 class MaintenanceRequestSerializer(serializers.ModelSerializer):
 
+    # Show usernames instead of user IDs
     created_by = serializers.ReadOnlyField(
         source='created_by.username'
     )
@@ -34,6 +32,7 @@ class MaintenanceRequestSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
 
+        # These fields are controlled by the backend
         read_only_fields = [
             'status',
             'assigned_to',
@@ -42,6 +41,7 @@ class MaintenanceRequestSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
 
+    # Basic title validation
     def validate_title(self, value):
 
         if len(value.strip()) < 3:
@@ -52,6 +52,7 @@ class MaintenanceRequestSerializer(serializers.ModelSerializer):
 
         return value
 
+    # Make sure description is meaningful
     def validate_description(self, value):
 
         if len(value.strip()) < 10:
@@ -63,12 +64,11 @@ class MaintenanceRequestSerializer(serializers.ModelSerializer):
         return value
 
 
-# =========================
 # ASSIGNMENT SERIALIZER
-# =========================
 
 class AssignmentSerializer(serializers.ModelSerializer):
 
+    # Only staff users can be assigned tasks
     assigned_to = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.filter(
             profile__role='staff'
@@ -94,9 +94,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
         return user
 
 
-# =========================
 # STATUS UPDATE SERIALIZER
-# =========================
 
 class StatusUpdateSerializer(serializers.ModelSerializer):
 
@@ -108,6 +106,7 @@ class StatusUpdateSerializer(serializers.ModelSerializer):
             'status',
         ]
 
+    # Restrict updates to valid statuses only
     def validate_status(self, value):
 
         allowed_statuses = [

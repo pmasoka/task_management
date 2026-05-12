@@ -1,38 +1,106 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+
+import { useEffect, useState } from "react";
 
 import PrivateRoute from "./routes/PrivateRoute";
 
 import Login from "./pages/Login";
+
 import Unauthorized from "./pages/Unauthorized";
 
 import ResidentDashboard from "./pages/ResidentDashboard";
+
 import StaffDashboard from "./pages/StaffDashboard";
+
 import ManagerDashboard from "./pages/ManagerDashboard";
+
 
 function App() {
 
-  /*
-    Example authenticated user.
-    Later replace this with:
-    - Context API
-    - Redux
-    - /me endpoint
-  */
+  const [user, setUser] = useState(null);
 
-  const user = {
-    username: "john",
-    role: "resident",
-  };
+  const [loading, setLoading] = useState(true);
+
+
+  // =========================
+  // CHECK SESSION
+  // =========================
+
+  useEffect(() => {
+
+    fetch(
+      "http://127.0.0.1:8000/api/session/",
+      {
+        credentials: "include",
+      }
+    )
+      .then((response) => response.json())
+
+      .then((data) => {
+
+        if (data.isAuthenticated) {
+
+          setUser({
+            username: data.username,
+            role: data.role,
+          });
+        }
+
+        setLoading(false);
+      })
+
+      .catch((error) => {
+
+        console.error(error);
+
+        setLoading(false);
+      });
+
+  }, []);
+
+
+  // =========================
+  // LOADING
+  // =========================
+
+  if (loading) {
+
+    return <h3>Loading...</h3>;
+  }
+
 
   return (
+
     <BrowserRouter>
+
       <Routes>
 
-        {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/unauthorized" element={<Unauthorized />} />
+        {/* Default */}
+        <Route
+          path="/"
+          element={<Navigate to="/login" replace />}
+        />
 
-        {/* Resident Routes */}
+        {/* Public */}
+        <Route
+          path="/login"
+          element={
+            <Login setUser={setUser} />
+          }
+        />
+
+        <Route
+          path="/unauthorized"
+          element={<Unauthorized />}
+        />
+
+
+        {/* Resident */}
         <Route
           element={
             <PrivateRoute
@@ -47,7 +115,8 @@ function App() {
           />
         </Route>
 
-        {/* Staff Routes */}
+
+        {/* Staff */}
         <Route
           element={
             <PrivateRoute
@@ -62,7 +131,8 @@ function App() {
           />
         </Route>
 
-        {/* Manager Routes */}
+
+        {/* Manager */}
         <Route
           element={
             <PrivateRoute
@@ -77,7 +147,15 @@ function App() {
           />
         </Route>
 
+
+        {/* Catch All */}
+        <Route
+          path="*"
+          element={<Navigate to="/login" replace />}
+        />
+
       </Routes>
+
     </BrowserRouter>
   );
 }
