@@ -1,0 +1,11 @@
+schemaVersion: 1.2
+
+endpoints:
+  - name: backend
+    displayName: Django Backend
+    service:
+      basePath: /
+      port: 8000          # ← Change if your Django app runs on a different port
+    type: REST
+    networkVisibilities:
+      - Public              # or Organization / Project
